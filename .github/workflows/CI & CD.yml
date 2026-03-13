@@ -43,6 +43,6 @@ jobs:
       run: |
         docker tag flaskapp:latest yourdockerhubusername/flaskapp:latest
 
-    - name: Push Docker image
+    - name: Push Docker images
       run: |
         docker push yourdockerhubusername/flaskapp:latest
