@@ -37,7 +37,7 @@ jobs:
 
     - name: Tag Docker image
       run: |
-        docker tag flaskapp:latest yourdockerhubusername/flaskapp:latest
+        docker tag flaskapp:latest ${{ secrets.DOCKER_USERNAME }}/flaskapp:latest
 
     - name: Push Docker images
       run: |
