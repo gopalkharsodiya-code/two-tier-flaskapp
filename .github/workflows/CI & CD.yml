@@ -41,4 +41,4 @@ jobs:
 
     - name: Push Docker images
       run: |
-        docker push yourdockerhubusername/flaskapp:latest
+        docker push ${{ secrets.DOCKER_USERNAME }}/flaskapp:latest
