@@ -41,13 +41,15 @@ jobs:
       - name: Push Docker image
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/flaskapp:latest
-deploy:
-  runs-on: self-hosted
 
-  steps:
-    - name: Deploy directly
-      run: |
-        docker pull ${{ secrets.DOCKER_USERNAME }}/flaskapp:latest
-        docker stop flaskapp || true
-        docker rm flaskapp || true
-        docker run -d -p 5000:5000 --name flaskapp ${{ secrets.DOCKER_USERNAME }}/flaskapp:latest
+  deploy:
+    needs: build           # ✅ ensures deploy runs after build
+    runs-on: self-hosted   # ✅ your self-hosted runner
+
+    steps:
+      - name: Deploy directly
+        run: |
+          docker pull ${{ secrets.DOCKER_USERNAME }}/flaskapp:latest
+          docker stop flaskapp || true
+          docker rm flaskapp || true
+          docker run -d -p 5000:5000 --name flaskapp ${{ secrets.DOCKER_USERNAME }}/flaskapp:latest
