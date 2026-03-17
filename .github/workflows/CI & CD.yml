@@ -38,5 +38,31 @@ jobs:
           docker tag flaskapp:latest ${{ secrets.DOCKER_USERNAME }}/flaskapp:latest
 
       - name: Push Docker image
+
+      name: Deploy App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest   # GitHub-hosted runner
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /var/www/html
+            git pull origin main
+            docker compose up -d --build
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/flaskapp:latest
