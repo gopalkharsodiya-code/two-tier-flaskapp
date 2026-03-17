@@ -6,11 +6,11 @@ on:
       - main
 
 jobs:
+
   build:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -42,13 +42,14 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/flaskapp:latest
 
-      jobs:
+
   deploy:
+    needs: build
     runs-on: self-hosted
 
     steps:
       - name: Pull Docker Image
-        run: docker pull <your-docker-username>/flaskapp:latest
+        run: docker pull ${{ secrets.DOCKER_USERNAME }}/flaskapp:latest
 
       - name: Stop Old Container
         run: docker stop flaskapp || true
@@ -57,4 +58,4 @@ jobs:
         run: docker rm flaskapp || true
 
       - name: Run New Container
-        run: docker run -d -p 5000:5000 --name flaskapp <your-docker-username>/flaskapp:latest
+        run: docker run -d -p 5000:5000 --name flaskapp ${{ secrets.DOCKER_USERNAME }}/flaskapp:latest
