@@ -37,14 +37,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Deploy to server via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
+    
             docker pull ${{ secrets.DOCKER_USERNAME }}/flaskapp:latest
             docker stop flaskapp || true
             docker rm flaskapp || true
