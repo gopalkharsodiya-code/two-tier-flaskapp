@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Enter image tag (example: v1.0)"
+        description: "Enter image tag"
         required: false
 
 env:
