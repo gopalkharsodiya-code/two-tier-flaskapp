@@ -65,6 +65,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
+          port: 25
           script: |
             docker pull ${{ secrets.DOCKER_USERNAME }}/flaskapp:${{ needs.build.outputs.image_tag }}
             docker stop flaskapp || true
