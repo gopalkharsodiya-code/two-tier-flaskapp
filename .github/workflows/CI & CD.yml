@@ -70,5 +70,5 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/flaskapp:${{ needs.build.outputs.image_tag }}
             docker stop flaskapp || true
             docker rm flaskapp || true
-            docker run -d -p 5000:5000 --name flaskapp \
+            docker run -d -p 5007:5000 --name flaskapp \
             ${{ secrets.DOCKER_USERNAME }}/flaskapp:${{ needs.build.outputs.image_tag }}
