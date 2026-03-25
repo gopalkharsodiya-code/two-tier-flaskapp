@@ -17,18 +17,23 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.set_tag.outputs.TAG }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set image tag
+        id: set_tag
         run: |
           if [ -z "${{ github.event.inputs.tag }}" ]; then
-            echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
+            TAG=${GITHUB_SHA::7}
           else
-            echo "TAG=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+            TAG=${{ github.event.inputs.tag }}
           fi
+          echo "TAG=$TAG" >> $GITHUB_ENV
+          echo "TAG=$TAG" >> $GITHUB_OUTPUT
 
       - name: Build Docker image
         run: docker build -t $IMAGE_NAME:$TAG .
@@ -55,7 +60,7 @@ jobs:
 
     steps:
       - name: Pull image
-        run: docker pull ${{ secrets.DOCKER_USERNAME }}/flaskapp:${{ env.TAG }}
+        run: docker pull ${{ secrets.DOCKER_USERNAME }}/flaskapp:${{ needs.build.outputs.image_tag }}
 
       - name: Stop & remove old container
         run: |
@@ -65,7 +70,7 @@ jobs:
       - name: Run new container
         run: |
           docker run -d -p 5000:5000 --name flaskapp \
-          ${{ secrets.DOCKER_USERNAME }}/flaskapp:${{ env.TAG }}
+          ${{ secrets.DOCKER_USERNAME }}/flaskapp:${{ needs.build.outputs.image_tag }}
 
       - name: Verify container
         run: docker ps
