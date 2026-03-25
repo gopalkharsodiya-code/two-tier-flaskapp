@@ -54,22 +54,20 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:$TAG
           docker push ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:latest
 
-deploy:
-  needs: build
-  runs-on: ubuntu-latest
+  deploy:   # ✅ FIXED (now inside jobs)
+    needs: build
+    runs-on: ubuntu-latest
 
-  steps:
-    - name: Deploy to NUC via SSH
-      uses: appleboy/ssh-action@v0.1.10
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.SSH_KEY }}
-        script: |
-          docker pull ${{ secrets.DOCKER_USERNAME }}/flaskapp:${{ needs.build.outputs.image_tag }}
-
-          docker stop flaskapp || true
-          docker rm flaskapp || true
-
-          docker run -d -p 5000:5000 --name flaskapp \
-          ${{ secrets.DOCKER_USERNAME }}/flaskapp:${{ needs.build.outputs.image_tag }}
+    steps:
+      - name: Deploy to NUC via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            docker pull ${{ secrets.DOCKER_USERNAME }}/flaskapp:${{ needs.build.outputs.image_tag }}
+            docker stop flaskapp || true
+            docker rm flaskapp || true
+            docker run -d -p 5000:5000 --name flaskapp \
+            ${{ secrets.DOCKER_USERNAME }}/flaskapp:${{ needs.build.outputs.image_tag }}
