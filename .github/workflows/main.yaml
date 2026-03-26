@@ -25,6 +25,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Cat
+        run: cat templates/index.html
+
       - name: Set image tag
         id: set_tag
         run: |
