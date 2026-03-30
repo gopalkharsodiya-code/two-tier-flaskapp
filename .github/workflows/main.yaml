@@ -73,7 +73,7 @@ jobs:
           key: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
           port: 2222
           script: |
-            cd /home/docker-ce/flaskapp-dev
+            cd /home/docker-ce/develop
             docker compose pull
             docker compose down
             docker compose up -d
