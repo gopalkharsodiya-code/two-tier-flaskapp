@@ -11,6 +11,14 @@ on:
       tag:
         description: "Enter image tag (optional)"
         required: false
+         environment:
+      description: "Select deployment environment"
+      required: true
+      default: develop
+      type: choice
+      options:
+        - develop
+        - main
 
 env:
   IMAGE_NAME: flaskapp
