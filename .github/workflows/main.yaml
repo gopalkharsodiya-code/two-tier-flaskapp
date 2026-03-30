@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - develop
 
   workflow_dispatch:
     inputs:
@@ -25,6 +26,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Print branch (debug)
+        run: |
+          echo "Branch = ${{ github.ref }}"
+          echo "Branch name = ${{ github.ref_name }}"
+
       - name: Set image tag
         id: set_tag
         run: |
@@ -33,7 +39,6 @@ jobs:
           else
             TAG=${{ github.event.inputs.tag }}
           fi
-
           echo "TAG=$TAG" >> $GITHUB_ENV
           echo "TAG=$TAG" >> $GITHUB_OUTPUT
 
@@ -50,38 +55,49 @@ jobs:
         run: |
           docker tag $IMAGE_NAME:$TAG ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:$TAG
           docker tag $IMAGE_NAME:$TAG ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:latest
-
           docker push ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:$TAG
           docker push ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:latest
 
 
-  deploy:
-    needs: build
+  deploy-dev:
     runs-on: ubuntu-latest
+    needs: build
+    if: github.ref_name == 'develop'
 
     steps:
-      - name: Deploy to NUC via SSH
+      - name: Deploy to DEV server
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.DEV_SERVER_IP }}
+          username: ${{ secrets.DEV_SERVER_USER }}
+          key: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
+          port: 2222
+          script: |
+            cd /home/docker-ce/flaskapp-dev
+            docker compose pull
+            docker compose down
+            docker compose up -d
+            docker system prune -af
+            echo "✅ DEV Deployment successful"
+
+
+  deploy-prod:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref_name == 'main'
+
+    steps:
+      - name: Deploy to PROD server
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 25
+          port: 2222
           script: |
-
-            echo "📁 Moving to project directory"
             cd /home/docker-ce/flaskapp
-
-            echo "📥 Pull latest images from Docker Hub"
             docker compose pull
-
-            echo "🛑 Stopping old containers"
             docker compose down
-
-            echo "🚀 Starting updated containers"
-            docker compose up -d --build
-
-            echo "🧹 Cleaning unused Docker resources"
+            docker compose up -d
             docker system prune -af
-
-            echo "✅ Deployment successful"
+            echo "✅ Production Deployment successful"
