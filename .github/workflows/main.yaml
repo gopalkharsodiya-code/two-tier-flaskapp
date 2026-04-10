@@ -87,6 +87,36 @@ jobs:
             docker system prune -af
             echo "✅ DEV Deployment successful"
 
+
+  deploy-Uat:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref_name == 'Uat' || github.event.inputs.environment == 'Uat'
+
+    steps:
+      - name: Deploy to UAT server
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.UAT_SERVER_IP }}
+          username: ${{ secrets.UAT_SERVER_USER }}
+          key: ${{ secrets.UAT_SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd /home/docker-ce/Uat
+            docker compose pull
+            docker compose down
+            docker compose up -d
+            docker system prune -af
+            echo "✅ DEV Deployment successful"
+          
+
+
+            
+  
+
+
+            
+
   deploy-prod:
     runs-on: ubuntu-latest
     needs: build
