@@ -101,7 +101,7 @@ jobs:
           host: ${{ secrets.UAT_SERVER_IP }}
           username: ${{ secrets.UAT_SERVER_USER }}
           key: ${{ secrets.UAT_SSH_PRIVATE_KEY }}
-          port: 22
+          port: 2222
           script: |
             cd /home/docker-ce/Uat
             docker compose pull
