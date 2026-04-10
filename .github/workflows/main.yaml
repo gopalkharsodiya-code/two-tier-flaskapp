@@ -8,7 +8,7 @@ on:
       - Uat
 
   workflow_dispatch:
-    inputs:
+    inputs: #cvfvf
       tag:
         description: "Enter image tag (optional)"
         required: false
