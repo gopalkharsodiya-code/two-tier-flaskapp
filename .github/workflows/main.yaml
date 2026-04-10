@@ -108,7 +108,7 @@ jobs:
             docker compose down
             docker compose up -d
             docker system prune -af
-            echo "✅ DEV Deployment successful"
+            echo "✅ UAT Deployment successful"
           
 
 
